@@ -184,7 +184,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
     <p id="introBlurb"></p>
     <ul class="tips" id="introTips"></ul>
     <div class="ctrls" id="introCtrls"></div>
-    <div class="actions"><button id="introGo" class="mcbtn primary"><span class="pad a">A</span> Ready! <span class="small nopad">(or press an action key)</span></button></div>
+    <div class="actions"><button id="introGo" class="mcbtn primary"><span class="pad a">A</span> Ready! <span class="small nopad">(or press an action key)</span></button><button id="introBack" class="mcbtn"><span class="pad b">B</span> Back <span class="small nopad">(Esc)</span></button></div>
   </div>
 </section>
 
@@ -1961,7 +1961,7 @@ function visibleScreen() { return screens.map(s => $(s)).find(s => !s.hidden) ||
 let padActAt = 0;
 document.addEventListener('click', e => { if (e.isTrusted && performance.now() - padActAt < 450) { e.stopPropagation(); e.preventDefault(); } }, true);
 const PAD_MAP = {
-  scrIntro: { a: 'introGo', start: 'introGo' },
+  scrIntro: { a: 'introGo', start: 'introGo', b: 'introBack' },
   scrResult: { a: 'resNext', start: 'resNext', b: 'resMenu' },
   scrFinal: { a: 'bonusBtn', start: 'bonusBtn', x: 'againBtn', y: 'newBtn' },
   scrPause: { a: 'resumeBtn', b: 'resumeBtn', start: 'resumeBtn', y: 'quitBtn' },
@@ -2198,6 +2198,7 @@ $('lobbyKeys').onclick = () => { renderCards(); showScreen('scrMenu'); };
 try { if ('gamepadInputEmulation' in navigator) navigator.gamepadInputEmulation = 'gamepad'; } catch (e) {}
 $('pauseMute').onclick = () => setMute(!muted);
 $('introGo').onclick = () => { audio(); beginCountdown(); };
+$('introBack').onclick = toMenu;
 $('resNext').onclick = nextRound;
 $('againBtn').onclick = () => { cup.pts = cup.players.map(() => 0); cup.round = 0; cup.single = null; showIntro(); };
 $('bonusBtn').onclick = () => { cup.single = -1; showIntro(); };
@@ -2219,6 +2220,7 @@ addEventListener('keydown', e => {
   keys.add(e.code);
   if ((e.code === 'Escape' || e.code === 'KeyP') && (mode === 'play' || mode === 'countdown')) { e.preventDefault(); pause(); return; }
   if (e.code === 'Escape' && mode === 'paused') { e.preventDefault(); resume(); return; }
+  if (e.code === 'Escape' && mode === 'intro') { e.preventDefault(); toMenu(); return; }
   if (e.code === 'KeyM') setMute(!muted);
   if (GAME_KEYS.has(e.code) && (mode === 'play' || mode === 'countdown' || mode === 'timeup')) e.preventDefault();
   const pb = primaryButton();

@@ -134,6 +134,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
       <button id="startBtn" class="mcbtn primary">Start the Cup</button>
       <button id="padsBtn" class="mcbtn" hidden>Controller lobby</button>
       <button id="muteBtn" class="mcbtn">Sound: On</button>
+      <button id="fsBtn" class="mcbtn fs-btn" hidden>Full screen <span class="small nopad">(F)</span></button>
     </div>
     <p class="hint">Or play one game on its own:</p>
     <div class="actions" id="singleBtns"></div>
@@ -170,6 +171,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
     <p id="lobbyErr" class="err" role="alert"></p>
     <div class="actions">
       <button id="lobbyStart" class="mcbtn primary"><span class="pad start">☰ MENU</span> Play</button>
+      <button id="fsBtn2" class="mcbtn fs-btn" hidden>Full screen</button>
       <button id="lobbyKeys" class="mcbtn">Keyboard setup</button>
     </div>
   </div>
@@ -1957,7 +1959,8 @@ function showScreen(id) {
    and a trusted (pointer) click right after a controller action is swallowed so A never fires twice. */
 function visibleScreen() { return screens.map(s => $(s)).find(s => !s.hidden) || null; }
 let padActAt = 0;
-document.addEventListener('click', e => { if (e.isTrusted && performance.now() - padActAt < 450) { e.stopPropagation(); e.preventDefault(); } }, true);
+// full-screen buttons are exempt: a real pointer click is the only way a browser allows full screen
+document.addEventListener('click', e => { if (e.isTrusted && performance.now() - padActAt < 450 && !e.target.closest('.fs-btn')) { e.stopPropagation(); e.preventDefault(); } }, true);
 const PAD_MAP = {
   scrIntro: { a: 'introGo', start: 'introGo', b: 'introBack' },
   scrResult: { a: 'resNext', start: 'resNext', b: 'resMenu' },
@@ -2195,6 +2198,26 @@ $('lobbyKeys').onclick = () => { renderCards(); showScreen('scrMenu'); };
 // legacy Edge on Xbox drives a mouse cursor with the controller unless the page asks for raw gamepad input
 try { if ('gamepadInputEmulation' in navigator) navigator.gamepadInputEmulation = 'gamepad'; } catch (e) {}
 $('pauseMute').onclick = () => setMute(!muted);
+/* full screen: needs a real click or key press, and may be unavailable (e.g. inside an embedded page) */
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+const fsOK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+function toggleFullscreen() {
+  try {
+    const p = fsEl() ? (document.exitFullscreen || document.webkitExitFullscreen).call(document)
+      : (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement);
+    if (p && p.catch) p.catch(() => {});
+  } catch (e) {}
+}
+function syncFsButtons() {
+  ['fsBtn', 'fsBtn2'].forEach(id => {
+    const b = $(id); b.hidden = !fsOK;
+    b.firstChild.textContent = fsEl() ? 'Exit full screen ' : 'Full screen ';
+  });
+}
+['fsBtn', 'fsBtn2'].forEach(id => { $(id).onclick = toggleFullscreen; });
+document.addEventListener('fullscreenchange', syncFsButtons);
+document.addEventListener('webkitfullscreenchange', syncFsButtons);
+syncFsButtons();
 $('introGo').onclick = () => { audio(); beginCountdown(); };
 $('introBack').onclick = toMenu;
 $('resNext').onclick = nextRound;
@@ -2219,6 +2242,8 @@ addEventListener('keydown', e => {
   if ((e.code === 'Escape' || e.code === 'KeyP') && (mode === 'play' || mode === 'countdown')) { e.preventDefault(); pause(); return; }
   if (e.code === 'Escape' && mode === 'paused') { e.preventDefault(); resume(); return; }
   if (e.code === 'Escape' && mode === 'intro') { e.preventDefault(); toMenu(); return; }
+  // F toggles full screen on menu screens only: during play it is the T F G H player's left key
+  if (e.code === 'KeyF' && fsOK && !(mode === 'play' || mode === 'countdown' || mode === 'timeup')) { e.preventDefault(); toggleFullscreen(); return; }
   if (e.code === 'KeyM') setMute(!muted);
   if (GAME_KEYS.has(e.code) && (mode === 'play' || mode === 'countdown' || mode === 'timeup')) e.preventDefault();
   const pb = primaryButton();

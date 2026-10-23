@@ -85,6 +85,28 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
 .standings li{background:var(--pc);color:#fff;text-shadow:1px 1px 0 rgba(0,0,0,.5);padding:6px 10px;font-weight:700;font-size:16px;display:flex;gap:8px;align-items:center}
 .final .panel{max-width:720px;padding:14px 18px}
 .final-line{margin:0;text-align:center;font-size:18px}
+/* controller button badges show only once a controller has been seen */
+.pad{display:none;align-items:center;justify-content:center;min-width:1.5em;height:1.5em;padding:0 .3em;box-sizing:border-box;border-radius:999px;
+  font:700 .75em var(--font);color:#fff;text-shadow:none;background:#3c3c3c;border:2px solid rgba(0,0,0,.45);vertical-align:middle;margin-right:.25em}
+.has-pad .pad{display:inline-flex}
+.has-pad .nopad{display:none}
+.pad.a{background:#3f9b2f}.pad.b{background:#c8352b}.pad.x{background:#2f6fd1}.pad.y{background:#c99a12}.pad.start,.pad.dpad{background:#3c3c3c;border-radius:6px}
+.lobby .pad{display:inline-flex}
+/* the lobby must fit one TV screen with no scrolling, even at the Xbox browser's 960x540 */
+.panel.lobby{gap:10px;padding:14px 18px}
+.lobby .logo h1{font-size:clamp(26px,4.2vw,46px)}
+.lobby .splash{font-size:clamp(12px,1.7vw,18px)}
+.lobby .eyebrow{font-size:13px}
+.gamepick{display:flex;align-items:center;justify-content:center;gap:16px;text-align:center;background:rgba(0,0,0,.08);padding:6px 12px}
+.gp-text{min-width:0;flex:1;max-width:560px}
+.gp-text h2{font-size:clamp(22px,3.2vw,34px);color:#fff;text-shadow:3px 3px 0 #3a3a3a}
+.gp-text .hint{margin-top:2px;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.slot{min-height:140px;align-items:center;text-align:center;gap:4px}
+.slot canvas{width:42px;height:70px;image-rendering:pixelated}
+.slot.empty{display:grid;place-items:center;border:3px dashed #7a7a7a;background:rgba(0,0,0,.1);color:var(--ink-soft);font-weight:700;font-size:17px;padding:12px}
+.lobbyhint{margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;font-size:16px;font-weight:600}
+@media (max-width:640px){.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.splash{animation:none}}
 </style>
 
@@ -110,7 +132,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
     <p id="setupErr" class="err" role="alert"></p>
     <div class="actions">
       <button id="startBtn" class="mcbtn primary">Start the Cup</button>
-      <button id="padsBtn" class="mcbtn" hidden>Use controllers</button>
+      <button id="padsBtn" class="mcbtn" hidden>Controller lobby</button>
       <button id="muteBtn" class="mcbtn">Sound: On</button>
     </div>
     <p class="hint">Or play one game on its own:</p>
@@ -122,10 +144,34 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
         <li>Each player has a goal in their own colour. Defend yours and score in everyone else's.</li>
         <li>Winning a round earns 3 cup points, second earns 2, third earns 1.</li>
         <li>Most cup points after all six games lifts the cup.</li>
-        <li>Game controllers (Xbox too): press a button on each one, then choose "Use controllers". Move through menus with the D-pad, press A to choose, and press Start to begin or pause.</li>
+        <li>Game controllers (Xbox too): press A on any controller to open the controller lobby. There, each player presses A to join, and START plays.</li>
         <li>On a keyboard, press Esc to pause and M to turn sound on or off.</li>
       </ul>
     </details>
+  </div>
+</section>
+
+<section id="scrLobby" class="screen" hidden>
+  <div class="panel lobby">
+    <div class="logo"><h1>Block Party Cup</h1><p class="splash" id="splash2">Happy 9th Birthday!</p></div>
+    <div class="gamepick">
+      <span class="pad dpad">▲</span>
+      <div class="gp-text"><p class="eyebrow">Game</p><h2 id="gameName">Full Cup</h2><p id="gameDesc" class="hint"></p></div>
+      <span class="pad dpad">▼</span>
+    </div>
+    <div id="lobbySlots" class="slots"></div>
+    <p class="lobbyhint">
+      <span><span class="pad a">A</span> join</span>
+      <span><span class="pad dpad">◀ ▶</span> character</span>
+      <span><span class="pad dpad">▲ ▼</span> game</span>
+      <span><span class="pad b">B</span> leave</span>
+      <span><span class="pad start">START</span> play</span>
+    </p>
+    <p id="lobbyErr" class="err" role="alert"></p>
+    <div class="actions">
+      <button id="lobbyStart" class="mcbtn primary"><span class="pad start">START</span> Play</button>
+      <button id="lobbyKeys" class="mcbtn">Keyboard setup</button>
+    </div>
   </div>
 </section>
 
@@ -136,7 +182,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
     <p id="introBlurb"></p>
     <ul class="tips" id="introTips"></ul>
     <div class="ctrls" id="introCtrls"></div>
-    <div class="actions"><button id="introGo" class="mcbtn primary">Ready! <span class="small">(or press an action key)</span></button></div>
+    <div class="actions"><button id="introGo" class="mcbtn primary"><span class="pad a">A</span> Ready! <span class="small nopad">(or press an action key)</span></button></div>
   </div>
 </section>
 
@@ -147,7 +193,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
     <table class="restable"><tbody id="resBody"></tbody></table>
     <h3 id="cupHead">Cup standings</h3>
     <ol class="standings" id="standings"></ol>
-    <div class="actions"><button id="resNext" class="mcbtn primary">Next round</button><button id="resMenu" class="mcbtn" hidden>Back to menu</button></div>
+    <div class="actions"><button id="resNext" class="mcbtn primary"><span class="pad a">A</span> <span id="resNextLabel">Next round</span></button><button id="resMenu" class="mcbtn" hidden><span class="pad b">B</span> Back to menu</button></div>
   </div>
 </section>
 
@@ -155,9 +201,9 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
   <div class="panel">
     <p class="final-line" id="finalLine"></p>
     <div class="actions">
-      <button id="bonusBtn" class="mcbtn primary">Bonus round: Cake Defence</button>
-      <button id="againBtn" class="mcbtn">Play the cup again</button>
-      <button id="newBtn" class="mcbtn">Change players</button>
+      <button id="bonusBtn" class="mcbtn primary"><span class="pad a">A</span> Bonus round: Cake Defence</button>
+      <button id="againBtn" class="mcbtn"><span class="pad x">X</span> Play the cup again</button>
+      <button id="newBtn" class="mcbtn"><span class="pad y">Y</span> Change players</button>
     </div>
   </div>
 </section>
@@ -166,9 +212,9 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
   <div class="panel narrow">
     <h2 style="color:#fff;text-shadow:3px 3px 0 #3a3a3a;font-size:40px;text-align:center">Paused</h2>
     <div class="actions">
-      <button id="resumeBtn" class="mcbtn primary">Resume</button>
+      <button id="resumeBtn" class="mcbtn primary"><span class="pad a">A</span> Resume</button>
       <button id="pauseMute" class="mcbtn">Sound: On</button>
-      <button id="quitBtn" class="mcbtn">Quit to menu</button>
+      <button id="quitBtn" class="mcbtn"><span class="pad y">Y</span> Quit to menu</button>
     </div>
   </div>
 </section>
@@ -1897,77 +1943,115 @@ let setup = { bday: '', length: 'normal', players: [{ name: 'Player 1', skin: 0,
 try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s && Array.isArray(s.players) && s.players.length >= 2) setup = Object.assign(setup, s); } catch (e) {}
 function saveSetup() { try { localStorage.setItem(LS_KEY, JSON.stringify(setup)); } catch (e) {} }
 
-const screens = ['scrMenu', 'scrIntro', 'scrResult', 'scrFinal', 'scrPause'];
+const screens = ['scrMenu', 'scrLobby', 'scrIntro', 'scrResult', 'scrFinal', 'scrPause'];
 function showScreen(id) {
   screens.forEach(s => { $(s).hidden = s !== id; });
   overlayAt = performance.now();
   $('pauseBtn').hidden = !!id || !(mode === 'play' || mode === 'countdown');
   if (!id) { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); return; }
-  const first = { scrMenu: 'startBtn', scrIntro: 'introGo', scrResult: 'resNext', scrFinal: 'bonusBtn', scrPause: 'resumeBtn' }[id];
+  const first = { scrMenu: 'startBtn', scrLobby: 'lobbyStart', scrIntro: 'introGo', scrResult: 'resNext', scrFinal: 'bonusBtn', scrPause: 'resumeBtn' }[id];
   try { $(first).focus({ preventScroll: true }); } catch (e) {}
 }
-/* controller menu navigation: D-pad / stick moves focus spatially, A presses, B backs out */
+/* Controllers never move focus or scroll: the Xbox browser already turns the stick into a mouse
+   pointer, and fighting it made menus jump. Each screen maps buttons straight to actions instead,
+   and a trusted (pointer) click right after a controller action is swallowed so A never fires twice. */
 function visibleScreen() { return screens.map(s => $(s)).find(s => !s.hidden) || null; }
-function focusables(root) { return [...root.querySelectorAll('button,input,select')].filter(el => !el.disabled && el.offsetParent !== null); }
-function navMove(dx, dy) {
-  const scr = visibleScreen(); if (!scr) return;
-  const els = focusables(scr); if (!els.length) return;
-  const cur = document.activeElement;
-  if (!els.includes(cur)) { (primaryButton() || els[0]).focus(); return; }
-  if (cur.tagName === 'SELECT' && dx) {
-    const n = cur.options.length; cur.selectedIndex = (cur.selectedIndex + dx + n) % n;
-    cur.dispatchEvent(new Event('change')); return;
-  }
-  const r = cur.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-  let best = null, bs = 1e9;
-  for (const el of els) {
-    if (el === cur) continue;
-    const q = el.getBoundingClientRect(), ex = q.left + q.width / 2, ey = q.top + q.height / 2;
-    const along = dx ? (ex - cx) * dx : (ey - cy) * dy;
-    if (along <= 4) continue;
-    const s = along + (dx ? Math.abs(ey - cy) : Math.abs(ex - cx)) * 2.5;
-    if (s < bs) { bs = s; best = el; }
-  }
-  if (best) { best.focus(); best.scrollIntoView({ block: 'nearest' }); }
-}
+let padActAt = 0;
+document.addEventListener('click', e => { if (e.isTrusted && performance.now() - padActAt < 450) { e.stopPropagation(); e.preventDefault(); } }, true);
+const PAD_MAP = {
+  scrIntro: { a: 'introGo', start: 'introGo' },
+  scrResult: { a: 'resNext', start: 'resNext', b: 'resMenu' },
+  scrFinal: { a: 'bonusBtn', start: 'bonusBtn', x: 'againBtn', y: 'newBtn' },
+  scrPause: { a: 'resumeBtn', b: 'resumeBtn', start: 'resumeBtn', y: 'quitBtn' },
+};
 const padNav = [];
-function padMenus(dt) {
+function padMenus() {
   const scr = visibleScreen();
   pads.forEach((p, i) => {
-    const st = padNav[i] || (padNav[i] = { a: true, b: true, s: true, dir: '', rep: 0 });
+    const st = padNav[i] || (padNav[i] = { btn: [true, true, true, true], dir: '' });
     const btn = n => !!(p.buttons[n] && p.buttons[n].pressed);
     const ax = p.axes[0] || 0, ay = p.axes[1] || 0;
     const dir = btn(12) || ay < -.6 ? 'u' : btn(13) || ay > .6 ? 'd' : btn(14) || ax < -.6 ? 'l' : btn(15) || ax > .6 ? 'r' : '';
-    const a = btn(0), b = btn(1), s = btn(9);
-    const ready = performance.now() - overlayAt > 500;
-    if (s && !st.s) {
-      audio();
-      if (mode === 'play' || mode === 'countdown') pause();
-      else if (mode === 'paused') resume();
-      else if (scr && ready) { const pb = scr.id === 'scrMenu' ? $('startBtn') : primaryButton() || $('againBtn'); if (pb && !pb.hidden) pb.click(); }
-    }
-    if (scr && ready) {
-      if (dir && (dir !== st.dir || (st.rep -= dt) <= 0)) {
-        st.rep = dir !== st.dir ? .35 : .14;
-        navMove(dir === 'l' ? -1 : dir === 'r' ? 1 : 0, dir === 'u' ? -1 : dir === 'd' ? 1 : 0);
+    const edge = n => btn(n) && !st.btn[n];
+    const ev = { a: edge(0), b: edge(1), x: edge(2), y: edge(3), start: edge(9), dir: dir !== st.dir ? dir : '' };
+    if (ev.a || ev.b || ev.start) audio();
+    if (mode === 'play' || mode === 'countdown') { if (ev.start) { padActAt = performance.now(); pause(); } }
+    else if (scr && performance.now() - overlayAt > 400) {
+      if (scr.id === 'scrMenu') { if (ev.a || ev.start) { padActAt = performance.now(); openLobby(); lobbyPad(i, { a: true }); } }
+      else if (scr.id === 'scrLobby') { if (ev.a || ev.b || ev.start || ev.dir) { padActAt = performance.now(); lobbyPad(i, ev); } }
+      else {
+        const map = PAD_MAP[scr.id] || {};
+        for (const k of ['a', 'b', 'x', 'y', 'start']) {
+          if (!ev[k] || !map[k]) continue;
+          const el = $(map[k]);
+          if (el && !el.hidden) { padActAt = performance.now(); el.click(); break; }
+        }
       }
-      if (a && !st.a) {
-        audio();
-        const cur = document.activeElement;
-        if (cur && scr.contains(cur) && cur !== document.body) { if (cur.tagName === 'INPUT') cur.click(); else cur.click(); }
-        else { const pb = primaryButton(); if (pb) pb.click(); }
-      }
-      if (b && !st.b && mode === 'paused') resume();
     }
-    st.dir = dir; st.a = a; st.b = b; st.s = s;
+    st.dir = dir; [0, 1, 2, 3, 9].forEach(n => { st.btn[n] = btn(n); });
   });
+}
+/* controller lobby: A joins, left/right picks a character, up/down picks the game, START plays */
+const lobby = { slots: [], game: 0 };
+const gameOpts = () => [
+  { label: 'Full Cup', desc: 'All six games in a row, then the cake bonus round.', v: null },
+  ...ROUNDS.map((R, i) => ({ label: R.name, desc: R.blurb, v: i })),
+  { label: BONUS.name, desc: 'Team game: everyone protects the birthday cake.', v: -1 },
+];
+function openLobby() {
+  lobby.slots = lobby.slots.filter(s => s.pad < pads.length);
+  mode = 'menu'; if (!world || !world.demo) world = demoWorld();
+  showScreen('scrLobby'); renderLobby();
+}
+function lobbyPad(i, ev) {
+  const k = lobby.slots.findIndex(s => s.pad === i), n = gameOpts().length;
+  $('lobbyErr').textContent = '';
+  if (ev.a && k < 0 && lobby.slots.length < 4) {
+    const used = lobby.slots.map(s => s.skin);
+    lobby.slots.push({ pad: i, skin: [...Array(PICK).keys()].find(s => !used.includes(s)) ?? 0 });
+    SFX.grab();
+  }
+  if (ev.b && k >= 0) lobby.slots.splice(k, 1);
+  if (k >= 0 && (ev.dir === 'l' || ev.dir === 'r')) lobby.slots[k].skin = (lobby.slots[k].skin + (ev.dir === 'r' ? 1 : PICK - 1)) % PICK;
+  if (ev.dir === 'u' || ev.dir === 'd') lobby.game = (lobby.game + (ev.dir === 'd' ? 1 : n - 1)) % n;
+  if (ev.start) { startLobby(); return; }
+  renderLobby();
+}
+function startLobby() {
+  if (!lobby.slots.length) { $('lobbyErr').textContent = 'Press A on a controller to join first.'; return; }
+  const seen = {};
+  const named = s => { const b = SKINS[s].name; seen[b] = (seen[b] || 0) + 1; return seen[b] > 1 ? `${b} ${seen[b]}` : b; };
+  setup.players = lobby.slots.map(s => ({ name: named(s.skin), skin: s.skin, ctrl: 'pad' + s.pad }));
+  if (setup.players.length === 1) { const sk = (lobby.slots[0].skin + 3) % PICK; setup.players.push({ name: 'Computer', skin: sk, ctrl: 'cpu' }); }
+  saveSetup();
+  startCup(gameOpts()[lobby.game].v);
+}
+function renderLobby() {
+  const g = gameOpts()[lobby.game], nm = setup.bday.trim();
+  $('splash2').textContent = nm ? `Happy 9th Birthday, ${nm}!` : 'Happy 9th Birthday!';
+  $('gameName').textContent = g.label; $('gameDesc').textContent = g.desc;
+  $('lobbySlots').replaceChildren(...[0, 1, 2, 3].map(k => {
+    const s = lobby.slots[k], card = document.createElement('div');
+    if (!s) { card.className = 'slot empty'; card.textContent = k === 0 ? 'Press A to join' : 'Press A on another controller'; return card; }
+    card.className = 'card slot'; card.style.setProperty('--pc', PCOL[k]);
+    const top = document.createElement('div'); top.className = 'card-top'; top.textContent = `Player ${k + 1}`;
+    const pc = mk(12, 20); pc.getContext('2d').drawImage(spr(s.skin), 0, 0);
+    const sn = document.createElement('div'); sn.className = 'skinname'; sn.textContent = `◀ ${SKINS[s.skin].name} ▶`;
+    const cn = document.createElement('div'); cn.className = 'small'; cn.textContent = `Controller ${s.pad + 1}`;
+    card.append(top, pc, sn, cn); return card;
+  }));
+  $('lobbyStart').disabled = !lobby.slots.length;
 }
 function demoWorld() {
   const sk = [0, 1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - .5);
   sfxOn = false;
   return makeBallWorld('soccer', [0, 1, 2, 3].map(i => ({ name: 'CPU', skin: sk[i], ctrl: 'cpu' })), { demo: true, dur: 9999 });
 }
-function toMenu() { mode = 'menu'; world = demoWorld(); parts = []; renderCards(); showScreen('scrMenu'); }
+function toMenu() {
+  mode = 'menu'; world = demoWorld(); parts = [];
+  if (lobby.slots.length && pads.length) { openLobby(); return; } // controller players go back to their lobby
+  renderCards(); showScreen('scrMenu');
+}
 function startCup(single = null) {
   const humans = setup.players.filter(p => p.ctrl !== 'cpu').map(p => p.ctrl);
   const dup = humans.find((c, i) => humans.indexOf(c) !== i);
@@ -2036,7 +2120,7 @@ function showResults() {
     tr.append(c1, c2, c3, c4); return tr;
   }));
   renderStandings();
-  $('resNext').textContent = coop && !world.won ? 'Try again' : single ? 'Play again' : cup.round < ROUNDS.length - 1 ? `Next: ${ROUNDS[cup.round + 1].name}` : 'Crown the champion';
+  $('resNextLabel').textContent = coop && !world.won ? 'Try again' : single ? 'Play again' : cup.round < ROUNDS.length - 1 ? `Next: ${ROUNDS[cup.round + 1].name}` : 'Crown the champion';
   showScreen('scrResult');
 }
 function renderStandings() {
@@ -2059,12 +2143,6 @@ function renderCards() {
   renderCardsInner();
   if (fid && $(fid)) $(fid).focus({ preventScroll: true });
   else if (fid && !$('scrMenu').hidden) $('startBtn').focus({ preventScroll: true });
-}
-function useControllers() {
-  const n = clamp(pads.length, 2, 4);
-  while (setup.players.length < n) { const i = setup.players.length; setup.players.push({ name: `Player ${i + 1}`, skin: (i * 3) % PICK, ctrl: 'cpu' }); }
-  setup.players.forEach((p, i) => { p.ctrl = i < pads.length ? 'pad' + i : 'cpu'; });
-  $('setupErr').textContent = ''; saveSetup(); renderCards();
 }
 function renderCardsInner() {
   $('bdayName').value = setup.bday; $('lenSel').value = setup.length;
@@ -2110,7 +2188,9 @@ $('singleBtns').replaceChildren(...ROUNDS.map((R, i) => {
   b.onclick = () => startCup(i); return b;
 }), (() => { const b = document.createElement('button'); b.id = 'singleBonus'; b.className = 'mcbtn'; b.textContent = 'Cake Defence (team)'; b.onclick = () => startCup(-1); return b; })());
 $('muteBtn').onclick = () => setMute(!muted);
-$('padsBtn').onclick = useControllers;
+$('padsBtn').onclick = openLobby;
+$('lobbyStart').onclick = startLobby;
+$('lobbyKeys').onclick = () => { renderCards(); showScreen('scrMenu'); };
 // legacy Edge on Xbox drives a mouse cursor with the controller unless the page asks for raw gamepad input
 try { if ('gamepadInputEmulation' in navigator) navigator.gamepadInputEmulation = 'gamepad'; } catch (e) {}
 $('pauseMute').onclick = () => setMute(!muted);
@@ -2149,12 +2229,12 @@ addEventListener('pointerdown', audio);
 let last = performance.now(), padCheck = 0;
 function update(dt) {
   pads = getPads();
-  padMenus(dt);
-  if ((padCheck -= dt) <= 0 && mode === 'menu') {
+  padMenus();
+  if ((padCheck -= dt) <= 0) {
     padCheck = 1;
-    $('padInfo').textContent = pads.length ? `${pads.length} game controller${pads.length > 1 ? 's' : ''} connected.` : 'Using game controllers? Press a button on each one so the game sees them.';
+    document.body.classList.toggle('has-pad', pads.length > 0);
+    $('padInfo').textContent = pads.length ? `${pads.length} game controller${pads.length > 1 ? 's' : ''} connected. Press A on one to open the controller lobby.` : 'Using game controllers? Press A on one to open the controller lobby.';
     $('padsBtn').hidden = !pads.length;
-    $('padsBtn').textContent = `Use ${pads.length} controller${pads.length === 1 ? '' : 's'}`;
   }
   if (mode === 'menu' && world) { world.time = 9999; updateBallWorld(world, dt); }
   else if (mode === 'countdown') {

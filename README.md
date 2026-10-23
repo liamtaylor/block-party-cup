@@ -7,7 +7,7 @@ A Minecraft-style party game for 2–4 players on one screen: Block Soccer, Wate
 ## Controls
 
 - Keyboard: W A S D + Space, Arrows + Enter, I J K L + U, T F G H + R, or Numpad + 0
-- Game controllers (including Xbox): press a button on each one, then choose "Use controllers" on the start screen. D-pad moves through menus, A selects, Start begins or pauses.
+- Game controllers (including Xbox): press A on any controller to open the controller lobby. Each player presses A to join, left/right picks a character, up/down picks the game, START plays. No pointer needed: every screen shows which button does what (A continue, B back, START pause).
 
 ## Editing
 

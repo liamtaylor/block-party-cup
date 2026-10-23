@@ -144,7 +144,7 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
         <li>Each player has a goal in their own colour. Defend yours and score in everyone else's.</li>
         <li>Winning a round earns 3 cup points, second earns 2, third earns 1.</li>
         <li>Most cup points after all six games lifts the cup.</li>
-        <li>Game controllers (Xbox too): press A on any controller to open the controller lobby. There, each player presses A to join, and START plays.</li>
+        <li>Game controllers (Xbox too): press A on any controller to open the controller lobby. There, each player presses A to join, and the Menu button (☰) or View button plays. During a game, either one pauses.</li>
         <li>On a keyboard, press Esc to pause and M to turn sound on or off.</li>
       </ul>
     </details>
@@ -165,11 +165,11 @@ details.howto ul{margin:8px 0 0;padding-left:20px;display:grid;gap:4px}
       <span><span class="pad dpad">◀ ▶</span> character</span>
       <span><span class="pad dpad">▲ ▼</span> game</span>
       <span><span class="pad b">B</span> leave</span>
-      <span><span class="pad start">START</span> play</span>
+      <span><span class="pad start">☰ MENU</span> play</span>
     </p>
     <p id="lobbyErr" class="err" role="alert"></p>
     <div class="actions">
-      <button id="lobbyStart" class="mcbtn primary"><span class="pad start">START</span> Play</button>
+      <button id="lobbyStart" class="mcbtn primary"><span class="pad start">☰ MENU</span> Play</button>
       <button id="lobbyKeys" class="mcbtn">Keyboard setup</button>
     </div>
   </div>
@@ -1973,7 +1973,8 @@ function padMenus() {
     const ax = p.axes[0] || 0, ay = p.axes[1] || 0;
     const dir = btn(12) || ay < -.6 ? 'u' : btn(13) || ay > .6 ? 'd' : btn(14) || ax < -.6 ? 'l' : btn(15) || ax > .6 ? 'r' : '';
     const edge = n => btn(n) && !st.btn[n];
-    const ev = { a: edge(0), b: edge(1), x: edge(2), y: edge(3), start: edge(9), dir: dir !== st.dir ? dir : '' };
+    // "start" is either centre button: Menu (☰, 9) or View (8), in case the browser keeps one for itself
+    const ev = { a: edge(0), b: edge(1), x: edge(2), y: edge(3), start: edge(9) || edge(8), dir: dir !== st.dir ? dir : '' };
     if (ev.a || ev.b || ev.start) audio();
     if (mode === 'play' || mode === 'countdown') { if (ev.start) { padActAt = performance.now(); pause(); } }
     else if (scr && performance.now() - overlayAt > 400) {
@@ -1988,10 +1989,10 @@ function padMenus() {
         }
       }
     }
-    st.dir = dir; [0, 1, 2, 3, 9].forEach(n => { st.btn[n] = btn(n); });
+    st.dir = dir; [0, 1, 2, 3, 8, 9].forEach(n => { st.btn[n] = btn(n); });
   });
 }
-/* controller lobby: A joins, left/right picks a character, up/down picks the game, START plays */
+/* controller lobby: A joins, left/right picks a character, up/down picks the game, Menu/View plays */
 const lobby = { slots: [], game: 0 };
 const gameOpts = () => [
   { label: 'Full Cup', desc: 'All six games in a row, then the cake bonus round.', v: null },

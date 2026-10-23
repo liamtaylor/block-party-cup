@@ -1,6 +1,6 @@
 # Block Party Cup
 
-A Minecraft-style party game for 2–4 players on one screen: Block Soccer, Water Polo, Spleef, Surf Showdown, Penalty Shootout and Mob Hunt. Play the full six-game cup or any game on its own. Built for a 9th birthday.
+A Minecraft-style party game for 2–4 players on one screen: Block Soccer, Water Polo, Spleef, Surf Showdown, Penalty Shootout and Mob Hunt. Play the full six-game cup or any game on its own, then finish with Birthday Cake Defence, a team bonus round where everyone protects the cake from silverfish. Built for a 9th birthday.
 
 **Play:** https://liamtaylor.github.io/block-party-cup/
 
